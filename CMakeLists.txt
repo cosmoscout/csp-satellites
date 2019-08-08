@@ -15,8 +15,6 @@ add_library(csp-satellites SHARED
 target_link_libraries(csp-satellites
   PUBLIC
     cs-core
-    cs-graphics
-    cs-scene
 )
 
 # install plugin -----------------------------------------------------------------------------------
