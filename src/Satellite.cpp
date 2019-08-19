@@ -8,9 +8,11 @@
 
 #include <VistaKernel/GraphicsManager/VistaNodeBridge.h>
 #include <VistaKernel/VistaSystem.h>
+#include <VistaKernelOpenSGExt/VistaOpenSGMaterialTools.h>
 
 #include "../../../src/cs-graphics/GltfLoader.hpp"
 #include "../../../src/cs-utils/convert.hpp"
+#include "../../../src/cs-utils/utils.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -44,6 +46,9 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   }
 
   mModel->attachTo(sceneGraph, mTransform);
+
+  VistaOpenSGMaterialTools::SetSortKeyOnSubtree(
+      mTransform, static_cast<int>(cs::utils::DrawOrder::eOpaqueItems));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
