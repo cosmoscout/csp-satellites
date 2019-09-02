@@ -40,15 +40,15 @@ void from_json(const nlohmann::json& j, Plugin::Settings::Transformation& o) {
     o.mRotation[i] = b2.at(i);
   }
 
-  o.mScale = j.at("scale").get<double>();
+  o.mScale = cs::core::parseProperty<double>("scale", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void from_json(const nlohmann::json& j, Plugin::Settings::Satellite& o) {
-  o.mModelFile      = j.at("modelFile").get<std::string>();
-  o.mEnvironmentMap = j.at("environmentMap").get<std::string>();
-  o.mSize           = j.at("size").get<double>();
+  o.mModelFile      = cs::core::parseProperty<std::string>("modelFile", j);
+  o.mEnvironmentMap = cs::core::parseProperty<std::string>("environmentMap", j);
+  o.mSize           = cs::core::parseProperty<double>("size", j);
 
   auto iter = j.find("transformation");
   if (iter != j.end()) {
@@ -59,7 +59,9 @@ void from_json(const nlohmann::json& j, Plugin::Settings::Satellite& o) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void from_json(const nlohmann::json& j, Plugin::Settings& o) {
-  o.mSatellites = j.at("satellites").get<std::map<std::string, Plugin::Settings::Satellite>>();
+  cs::core::parseSettingsSection("csp-satellites.satellites", [&] {
+    o.mSatellites = j.at("satellites").get<std::map<std::string, Plugin::Settings::Satellite>>();
+  });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
