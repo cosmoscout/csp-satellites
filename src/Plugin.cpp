@@ -50,7 +50,8 @@ void from_json(const nlohmann::json& j, Plugin::Settings::Satellite& o) {
   o.mEnvironmentMap = cs::core::parseProperty<std::string>("environmentMap", j);
   o.mSize           = cs::core::parseProperty<double>("size", j);
 
-  o.mTransformation = cs::core::parseOptionalSection<Plugin::Settings::Transformation>("transformation", j);
+  o.mTransformation =
+      cs::core::parseOptionalSection<Plugin::Settings::Transformation>("transformation", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +77,9 @@ void Plugin::init() {
           "There is no Anchor \"" + settings.first + "\" defined in the settings.");
     }
 
-
-    auto existence = cs::utils::convert::getExistenceFromSettings(*anchor);
+    auto   existence       = cs::utils::convert::getExistenceFromSettings(*anchor);
     double tStartExistence = existence.first;
-    double tEndExistence = existence.second;
+    double tEndExistence   = existence.second;
 
     auto satellite = std::make_shared<Satellite>(settings.second, anchor->second.mCenter,
         anchor->second.mFrame, tStartExistence, tEndExistence, mSceneGraph);
