@@ -13,6 +13,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <map>
 #include <optional>
+#include <string>
 #include <vector>
 
 namespace csp::satellites {
