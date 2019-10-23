@@ -44,6 +44,7 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   }
 
   mModel->attachTo(sceneGraph, mTransform);
+  mTransform->SetIsEnabled(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
