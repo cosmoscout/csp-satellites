@@ -49,6 +49,8 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
 
   VistaOpenSGMaterialTools::SetSortKeyOnSubtree(
       mTransform, static_cast<int>(cs::utils::DrawOrder::eOpaqueItems));
+
+  mTransform->SetIsEnabled(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,6 @@
 #include "Satellite.hpp"
 
 #include "../../../src/cs-core/SolarSystem.hpp"
-#include "../../../src/cs-utils/convert.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,26 +39,26 @@ void from_json(const nlohmann::json& j, Plugin::Settings::Transformation& o) {
     o.mRotation[i] = b2.at(i);
   }
 
-  o.mScale = j.at("scale").get<double>();
+  o.mScale = cs::core::parseProperty<double>("scale", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void from_json(const nlohmann::json& j, Plugin::Settings::Satellite& o) {
-  o.mModelFile      = j.at("modelFile").get<std::string>();
-  o.mEnvironmentMap = j.at("environmentMap").get<std::string>();
-  o.mSize           = j.at("size").get<double>();
+  o.mModelFile      = cs::core::parseProperty<std::string>("modelFile", j);
+  o.mEnvironmentMap = cs::core::parseProperty<std::string>("environmentMap", j);
+  o.mSize           = cs::core::parseProperty<double>("size", j);
 
-  auto iter = j.find("transformation");
-  if (iter != j.end()) {
-    o.mTransformation = iter->get<std::optional<Plugin::Settings::Transformation>>();
-  }
+  o.mTransformation =
+      cs::core::parseOptionalSection<Plugin::Settings::Transformation>("transformation", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void from_json(const nlohmann::json& j, Plugin::Settings& o) {
-  o.mSatellites = j.at("satellites").get<std::map<std::string, Plugin::Settings::Satellite>>();
+  cs::core::parseSection("csp-satellites", [&] {
+    o.mSatellites = cs::core::parseMap<std::string, Plugin::Settings::Satellite>("satellites", j);
+  });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,8 +76,9 @@ void Plugin::init() {
           "There is no Anchor \"" + settings.first + "\" defined in the settings.");
     }
 
-    double tStartExistence = cs::utils::convert::toSpiceTime(anchor->second.mStartExistence);
-    double tEndExistence   = cs::utils::convert::toSpiceTime(anchor->second.mEndExistence);
+    auto   existence       = cs::core::getExistenceFromSettings(*anchor);
+    double tStartExistence = existence.first;
+    double tEndExistence   = existence.second;
 
     auto satellite = std::make_shared<Satellite>(settings.second, anchor->second.mCenter,
         anchor->second.mFrame, tStartExistence, tEndExistence, mSceneGraph);
