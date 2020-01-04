@@ -9,6 +9,7 @@
 #include "Satellite.hpp"
 
 #include "../../../src/cs-core/SolarSystem.hpp"
+#include "../../../src/cs-utils/logger.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -63,8 +64,16 @@ void from_json(const nlohmann::json& j, Plugin::Settings& o) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Plugin::Plugin() {
+  // Create default logger for this plugin.
+  cs::utils::logger::init("csp-satellites");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void Plugin::init() {
-  std::cout << "Loading: CosmoScout VR Plugin Satellites" << std::endl;
+
+  spdlog::info("Loading plugin...");
 
   mPluginSettings = mAllSettings->mPlugins.at("csp-satellites");
 
@@ -88,14 +97,20 @@ void Plugin::init() {
 
     mSatellites.push_back(satellite);
   }
+
+  spdlog::info("Loading done.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Plugin::deInit() {
+  spdlog::info("Unloading plugin...");
+
   for (auto const& satellite : mSatellites) {
     mSolarSystem->unregisterBody(satellite);
   }
+
+  spdlog::info("Unloading done.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
