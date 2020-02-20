@@ -46,6 +46,8 @@ class Plugin : public cs::core::PluginBase {
     std::map<std::string, Satellite> mSatellites;
   };
 
+  Plugin();
+
   void init() override;
   void deInit() override;
 
