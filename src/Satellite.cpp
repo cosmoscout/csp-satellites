@@ -8,9 +8,13 @@
 
 #include <VistaKernel/GraphicsManager/VistaNodeBridge.h>
 #include <VistaKernel/VistaSystem.h>
+#include <VistaKernelOpenSGExt/VistaOpenSGMaterialTools.h>
 
+#include "../../../src/cs-core/GraphicsEngine.hpp"
+#include "../../../src/cs-core/SolarSystem.hpp"
 #include "../../../src/cs-graphics/GltfLoader.hpp"
 #include "../../../src/cs-utils/convert.hpp"
+#include "../../../src/cs-utils/utils.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -20,9 +24,14 @@ namespace csp::satellites {
 
 Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
     std::string const& sFrameName, double tStartExistence, double tEndExistence,
-    VistaSceneGraph* sceneGraph)
+    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
+    std::shared_ptr<cs::core::SolarSystem> const& solarSystem)
     : cs::scene::CelestialBody(sCenterName, sFrameName, tStartExistence, tEndExistence)
-    , mModel(new cs::graphics::GltfLoader(config.mModelFile, config.mEnvironmentMap, true))
+    , mSceneGraph(sceneGraph)
+    , mGraphicsEngine(graphicsEngine)
+    , mSolarSystem(solarSystem)
+    , mModel(std::make_unique<cs::graphics::GltfLoader>(
+          config.mModelFile, config.mEnvironmentMap, true))
     , mSize(config.mSize) {
 
   // TODO: make configurable
@@ -32,9 +41,8 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   mModel->setIBLIntensity(1.5);
   mModel->setLightColor(1.0, 1.0, 1.0);
 
-  mSceneGraph = sceneGraph;
-  mAnchor     = sceneGraph->NewTransformNode(sceneGraph->GetRoot());
-  mTransform  = sceneGraph->NewTransformNode(mAnchor);
+  mAnchor    = sceneGraph->NewTransformNode(sceneGraph->GetRoot());
+  mTransform = sceneGraph->NewTransformNode(mAnchor);
 
   if (config.mTransformation) {
     auto scale = (float)config.mTransformation->mScale;
@@ -44,14 +52,24 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   }
 
   mModel->attachTo(sceneGraph, mTransform);
+
+  VistaOpenSGMaterialTools::SetSortKeyOnSubtree(
+      mTransform, static_cast<int>(cs::utils::DrawOrder::eOpaqueItems));
+
   mTransform->SetIsEnabled(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Satellite::~Satellite() {
-  mSceneGraph->GetRoot()->DisconnectChild(mTransform);
-  mSceneGraph->GetRoot()->DisconnectChild(mAnchor);
+  if (mTransform) {
+    mSceneGraph->GetRoot()->DisconnectChild(mTransform);
+    delete mTransform;
+  }
+  if (mAnchor) {
+    mSceneGraph->GetRoot()->DisconnectChild(mAnchor);
+    delete mAnchor;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,11 +113,18 @@ void Satellite::update(double tTime, cs::scene::CelestialObserver const& oObs) {
         matWorldTransform[2][3], matWorldTransform[3][3]));
 
     if (mSun) {
-      auto sunTransform = mSun->getWorldTransform();
-      auto ownTransform = getWorldTransform();
-      auto sunDirection = sunTransform[3] - ownTransform[3];
+      float sunIlluminance(1.f);
+      auto  ownTransform = getWorldTransform();
+
+      auto sunDirection = mSolarSystem->getSunDirection(ownTransform[3]);
 
       mModel->setLightDirection(sunDirection.x, sunDirection.y, sunDirection.z);
+
+      if (mGraphicsEngine->pEnableHDR.get()) {
+        mModel->setEnableHDR(true);
+        sunIlluminance = mSolarSystem->getSunIlluminance(ownTransform[3]);
+      }
+      mModel->setLightIntensity(sunIlluminance);
     }
   }
 }

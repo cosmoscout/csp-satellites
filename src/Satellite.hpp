@@ -17,7 +17,12 @@
 
 namespace cs::graphics {
 class GltfLoader;
-}
+} // namespace cs::graphics
+
+namespace cs::core {
+class GraphicsEngine;
+class SolarSystem;
+} // namespace cs::core
 
 class VistaTransformNode;
 
@@ -28,7 +33,8 @@ class Satellite : public cs::scene::CelestialBody {
  public:
   Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
       std::string const& sFrameName, double tStartExistence, double tEndExistence,
-      VistaSceneGraph* sceneGraph);
+      VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
+      std::shared_ptr<cs::core::SolarSystem> const& solarSystem);
   ~Satellite() override;
 
   void update(double tTime, cs::scene::CelestialObserver const& oObs) override;
@@ -44,7 +50,9 @@ class Satellite : public cs::scene::CelestialBody {
 
  private:
   VistaSceneGraph*                                  mSceneGraph;
-  cs::graphics::GltfLoader*                         mModel;
+  std::shared_ptr<cs::core::GraphicsEngine>         mGraphicsEngine;
+  std::shared_ptr<cs::core::SolarSystem>            mSolarSystem;
+  std::unique_ptr<cs::graphics::GltfLoader>         mModel;
   VistaTransformNode*                               mAnchor;
   VistaTransformNode*                               mTransform;
   double                                            mSize;
