@@ -30,7 +30,7 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
     , mSceneGraph(sceneGraph)
     , mGraphicsEngine(graphicsEngine)
     , mSolarSystem(solarSystem)
-    , mModel(new cs::graphics::GltfLoader(config.mModelFile, config.mEnvironmentMap, true))
+    , mModel(std::make_unique<cs::graphics::GltfLoader>(config.mModelFile, config.mEnvironmentMap, true))
     , mSize(config.mSize) {
 
   // TODO: make configurable
@@ -61,8 +61,14 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Satellite::~Satellite() {
-  mSceneGraph->GetRoot()->DisconnectChild(mTransform);
-  mSceneGraph->GetRoot()->DisconnectChild(mAnchor);
+  if (mTransform) {
+    mSceneGraph->GetRoot()->DisconnectChild(mTransform);
+    delete mTransform;
+  }
+  if (mAnchor) {
+    mSceneGraph->GetRoot()->DisconnectChild(mAnchor);
+    delete mAnchor;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

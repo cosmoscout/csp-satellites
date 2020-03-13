@@ -52,7 +52,7 @@ class Satellite : public cs::scene::CelestialBody {
   VistaSceneGraph*                                  mSceneGraph;
   std::shared_ptr<cs::core::GraphicsEngine>         mGraphicsEngine;
   std::shared_ptr<cs::core::SolarSystem>            mSolarSystem;
-  cs::graphics::GltfLoader*                         mModel;
+  std::unique_ptr<cs::graphics::GltfLoader>         mModel;
   VistaTransformNode*                               mAnchor;
   VistaTransformNode*                               mTransform;
   double                                            mSize;
