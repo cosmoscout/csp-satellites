@@ -41,8 +41,8 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   mModel->setIBLIntensity(1.5);
   mModel->setLightColor(1.0, 1.0, 1.0);
 
-  mAnchor    = sceneGraph->NewTransformNode(sceneGraph->GetRoot());
-  mTransform = sceneGraph->NewTransformNode(mAnchor);
+  mAnchor.reset(sceneGraph->NewTransformNode(sceneGraph->GetRoot()));
+  mTransform.reset(sceneGraph->NewTransformNode(mAnchor.get()));
 
   if (config.mTransformation) {
     auto scale = (float)config.mTransformation->mScale;
@@ -51,10 +51,10 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
     setAnchorRotation(config.mTransformation->mRotation);
   }
 
-  mModel->attachTo(sceneGraph, mTransform);
+  mModel->attachTo(sceneGraph, mTransform.get());
 
   VistaOpenSGMaterialTools::SetSortKeyOnSubtree(
-      mTransform, static_cast<int>(cs::utils::DrawOrder::eOpaqueItems));
+      mTransform.get(), static_cast<int>(cs::utils::DrawOrder::eOpaqueItems));
 
   mTransform->SetIsEnabled(false);
 }
@@ -62,14 +62,8 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Satellite::~Satellite() {
-  if (mTransform) {
-    mSceneGraph->GetRoot()->DisconnectChild(mTransform);
-    delete mTransform;
-  }
-  if (mAnchor) {
-    mSceneGraph->GetRoot()->DisconnectChild(mAnchor);
-    delete mAnchor;
-  }
+  mSceneGraph->GetRoot()->DisconnectChild(mTransform.get());
+  mSceneGraph->GetRoot()->DisconnectChild(mAnchor.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
