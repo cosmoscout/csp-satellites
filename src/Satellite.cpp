@@ -94,7 +94,7 @@ glm::dvec3 Satellite::getRadii() const {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Satellite::update(double tTime, cs::scene::CelestialObserver const& oObs) {
-  cs::scene::CelestialObject::update(tTime, oObs);
+  cs::scene::CelestialBody::update(tTime, oObs);
 
   mTransform->SetIsEnabled(getIsInExistence() && pVisible.get());
 
