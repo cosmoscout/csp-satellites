@@ -90,9 +90,7 @@ void Plugin::init() {
           "There is no Anchor \"" + settings.first + "\" defined in the settings.");
     }
 
-    auto   existence       = cs::core::getExistenceFromSettings(*anchor);
-    double tStartExistence = existence.first;
-    double tEndExistence   = existence.second;
+    auto [tStartExistence, tEndExistence] = anchor->second.getExistence();
 
     auto satellite =
         std::make_shared<Satellite>(settings.second, anchor->second.mCenter, anchor->second.mFrame,
