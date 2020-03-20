@@ -29,37 +29,42 @@ namespace csp::satellites {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void from_json(const nlohmann::json& j, Plugin::Settings::Transformation& o) {
-  nlohmann::json b1 = j.at("translation");
-  for (int i = 0; i < 3; ++i) {
-    o.mTranslation[i] = b1.at(i);
-  }
+void from_json(nlohmann::json const& j, Plugin::Settings::Transformation& o) {
+  cs::core::Settings::deserialize(j, "translation", o.mTranslation);
+  cs::core::Settings::deserialize(j, "rotation", o.mRotation);
+  cs::core::Settings::deserialize(j, "scale", o.mScale);
+}
 
-  nlohmann::json b2 = j.at("rotation");
-  for (int i = 0; i < 4; ++i) {
-    o.mRotation[i] = b2.at(i);
-  }
-
-  o.mScale = cs::core::parseProperty<double>("scale", j);
+void to_json(nlohmann::json& j, Plugin::Settings::Transformation const& o) {
+  cs::core::Settings::serialize(j, "translation", o.mTranslation);
+  cs::core::Settings::serialize(j, "rotation", o.mRotation);
+  cs::core::Settings::serialize(j, "scale", o.mScale);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void from_json(const nlohmann::json& j, Plugin::Settings::Satellite& o) {
-  o.mModelFile      = cs::core::parseProperty<std::string>("modelFile", j);
-  o.mEnvironmentMap = cs::core::parseProperty<std::string>("environmentMap", j);
-  o.mSize           = cs::core::parseProperty<double>("size", j);
+void from_json(nlohmann::json const& j, Plugin::Settings::Satellite& o) {
+  cs::core::Settings::deserialize(j, "modelFile", o.mModelFile);
+  cs::core::Settings::deserialize(j, "environmentMap", o.mEnvironmentMap);
+  cs::core::Settings::deserialize(j, "size", o.mSize);
+  cs::core::Settings::deserialize(j, "transformation", o.mTransformation);
+}
 
-  o.mTransformation =
-      cs::core::parseOptionalSection<Plugin::Settings::Transformation>("transformation", j);
+void to_json(nlohmann::json& j, Plugin::Settings::Satellite const& o) {
+  cs::core::Settings::serialize(j, "modelFile", o.mModelFile);
+  cs::core::Settings::serialize(j, "environmentMap", o.mEnvironmentMap);
+  cs::core::Settings::serialize(j, "size", o.mSize);
+  cs::core::Settings::serialize(j, "transformation", o.mTransformation);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void from_json(const nlohmann::json& j, Plugin::Settings& o) {
-  cs::core::parseSection("csp-satellites", [&] {
-    o.mSatellites = cs::core::parseMap<std::string, Plugin::Settings::Satellite>("satellites", j);
-  });
+void from_json(nlohmann::json const& j, Plugin::Settings& o) {
+  cs::core::Settings::deserialize(j, "satellites", o.mSatellites);
+}
+
+void to_json(nlohmann::json& j, Plugin::Settings const& o) {
+  cs::core::Settings::serialize(j, "satellites", o.mSatellites);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
