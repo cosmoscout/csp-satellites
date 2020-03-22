@@ -10,7 +10,7 @@
 #include <VistaKernel/VistaSystem.h>
 #include <VistaKernelOpenSGExt/VistaOpenSGMaterialTools.h>
 
-#include "../../../src/cs-core/GraphicsEngine.hpp"
+#include "../../../src/cs-core/Settings.hpp"
 #include "../../../src/cs-core/SolarSystem.hpp"
 #include "../../../src/cs-graphics/GltfLoader.hpp"
 #include "../../../src/cs-utils/convert.hpp"
@@ -24,11 +24,11 @@ namespace csp::satellites {
 
 Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
     std::string const& sFrameName, double tStartExistence, double tEndExistence,
-    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
+    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::Settings> const& settings,
     std::shared_ptr<cs::core::SolarSystem> const& solarSystem)
     : cs::scene::CelestialBody(sCenterName, sFrameName, tStartExistence, tEndExistence)
     , mSceneGraph(sceneGraph)
-    , mGraphicsEngine(graphicsEngine)
+    , mSettings(settings)
     , mSolarSystem(solarSystem)
     , mModel(std::make_unique<cs::graphics::GltfLoader>(
           config.mModelFile, config.mEnvironmentMap, true))
@@ -114,7 +114,7 @@ void Satellite::update(double tTime, cs::scene::CelestialObserver const& oObs) {
 
       mModel->setLightDirection(sunDirection.x, sunDirection.y, sunDirection.z);
 
-      if (mGraphicsEngine->pEnableHDR.get()) {
+      if (mSettings->mGraphics.pEnableHDR.get()) {
         mModel->setEnableHDR(true);
         sunIlluminance = mSolarSystem->getSunIlluminance(ownTransform[3]);
       }

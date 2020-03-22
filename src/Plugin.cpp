@@ -94,7 +94,7 @@ void Plugin::init() {
 
     auto satellite =
         std::make_shared<Satellite>(settings.second, anchor->second.mCenter, anchor->second.mFrame,
-            tStartExistence, tEndExistence, mSceneGraph, mGraphicsEngine, mSolarSystem);
+            tStartExistence, tEndExistence, mSceneGraph, mAllSettings, mSolarSystem);
 
     satellite->setSun(mSolarSystem->getSun());
     mSolarSystem->registerBody(satellite);
