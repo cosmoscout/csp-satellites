@@ -99,12 +99,7 @@ void Satellite::update(double tTime, cs::scene::CelestialObserver const& oObs) {
   mTransform->SetIsEnabled(getIsInExistence() && pVisible.get());
 
   if (getIsInExistence() && pVisible.get()) {
-    mAnchor->SetTransform(glm::value_ptr(matWorldTransform), true/*VistaTransformMatrix(matWorldTransform[0][0], matWorldTransform[1][0],
-        matWorldTransform[2][0], matWorldTransform[3][0], matWorldTransform[0][1],
-        matWorldTransform[1][1], matWorldTransform[2][1], matWorldTransform[3][1],
-        matWorldTransform[0][2], matWorldTransform[1][2], matWorldTransform[2][2],
-        matWorldTransform[3][2], matWorldTransform[0][3], matWorldTransform[1][3],
-        matWorldTransform[2][3], matWorldTransform[3][3])*/);
+    mAnchor->SetTransform(glm::value_ptr(matWorldTransform), true);
 
     if (mSun) {
       float sunIlluminance(1.f);
