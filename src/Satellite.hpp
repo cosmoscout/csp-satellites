@@ -33,8 +33,8 @@ class Satellite : public cs::scene::CelestialBody {
  public:
   Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
       std::string const& sFrameName, double tStartExistence, double tEndExistence,
-      VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
-      std::shared_ptr<cs::core::SolarSystem> const& solarSystem);
+      VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> graphicsEngine,
+      std::shared_ptr<cs::core::SolarSystem> solarSystem);
   ~Satellite() override;
 
   void update(double tTime, cs::scene::CelestialObserver const& oObs) override;

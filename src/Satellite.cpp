@@ -17,6 +17,7 @@
 #include "../../../src/cs-utils/utils.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <utility>
 
 namespace csp::satellites {
 
@@ -24,12 +25,12 @@ namespace csp::satellites {
 
 Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
     std::string const& sFrameName, double tStartExistence, double tEndExistence,
-    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
-    std::shared_ptr<cs::core::SolarSystem> const& solarSystem)
+    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> graphicsEngine,
+    std::shared_ptr<cs::core::SolarSystem> solarSystem)
     : cs::scene::CelestialBody(sCenterName, sFrameName, tStartExistence, tEndExistence)
     , mSceneGraph(sceneGraph)
-    , mGraphicsEngine(graphicsEngine)
-    , mSolarSystem(solarSystem)
+    , mGraphicsEngine(std::move(graphicsEngine))
+    , mSolarSystem(std::move(solarSystem))
     , mModel(std::make_unique<cs::graphics::GltfLoader>(
           config.mModelFile, config.mEnvironmentMap, true))
     , mSize(config.mSize) {
