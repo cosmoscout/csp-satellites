@@ -35,6 +35,13 @@ class Satellite : public cs::scene::CelestialBody {
       std::string const& sFrameName, double tStartExistence, double tEndExistence,
       VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> graphicsEngine,
       std::shared_ptr<cs::core::SolarSystem> solarSystem);
+
+  Satellite(Satellite const& other) = delete;
+  Satellite(Satellite&& other)      = delete;
+
+  Satellite& operator=(Satellite const& other) = delete;
+  Satellite& operator=(Satellite&& other) = delete;
+
   ~Satellite() override;
 
   void update(double tTime, cs::scene::CelestialObserver const& oObs) override;
