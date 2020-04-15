@@ -17,6 +17,7 @@
 #include "../../../src/cs-utils/utils.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <utility>
 
 namespace csp::satellites {
 
@@ -24,12 +25,12 @@ namespace csp::satellites {
 
 Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string const& sCenterName,
     std::string const& sFrameName, double tStartExistence, double tEndExistence,
-    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> const& graphicsEngine,
-    std::shared_ptr<cs::core::SolarSystem> const& solarSystem)
+    VistaSceneGraph* sceneGraph, std::shared_ptr<cs::core::GraphicsEngine> graphicsEngine,
+    std::shared_ptr<cs::core::SolarSystem> solarSystem)
     : cs::scene::CelestialBody(sCenterName, sFrameName, tStartExistence, tEndExistence)
     , mSceneGraph(sceneGraph)
-    , mGraphicsEngine(graphicsEngine)
-    , mSolarSystem(solarSystem)
+    , mGraphicsEngine(std::move(graphicsEngine))
+    , mSolarSystem(std::move(solarSystem))
     , mModel(std::make_unique<cs::graphics::GltfLoader>(
           config.mModelFile, config.mEnvironmentMap, true))
     , mSize(config.mSize) {
@@ -45,7 +46,7 @@ Satellite::Satellite(Plugin::Settings::Satellite const& config, std::string cons
   mTransform.reset(sceneGraph->NewTransformNode(mAnchor.get()));
 
   if (config.mTransformation) {
-    auto scale = (float)config.mTransformation->mScale;
+    auto scale = static_cast<float>(config.mTransformation->mScale);
     mTransform->SetScale(scale, scale, scale);
     setAnchorPosition(config.mTransformation->mTranslation);
     setAnchorRotation(config.mTransformation->mRotation);
@@ -75,13 +76,13 @@ void Satellite::setSun(std::shared_ptr<const cs::scene::CelestialObject> const& 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool Satellite::getIntersection(
-    glm::dvec3 const& rayPos, glm::dvec3 const& rayDir, glm::dvec3& pos) const {
+    glm::dvec3 const& /*rayPos*/, glm::dvec3 const& /*rayDir*/, glm::dvec3& /*pos*/) const {
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double Satellite::getHeight(glm::dvec2 lngLat) const {
+double Satellite::getHeight(glm::dvec2 /*lngLat*/) const {
   return 0;
 }
 
@@ -102,7 +103,7 @@ void Satellite::update(double tTime, cs::scene::CelestialObserver const& oObs) {
     mAnchor->SetTransform(glm::value_ptr(matWorldTransform), true);
 
     if (mSun) {
-      float sunIlluminance(1.f);
+      float sunIlluminance(1.F);
       auto  ownTransform = getWorldTransform();
 
       auto sunDirection = glm::vec3(mSolarSystem->getSunDirection(ownTransform[3]));
