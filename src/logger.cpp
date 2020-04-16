@@ -14,7 +14,7 @@ namespace csp::satellites {
 
 spdlog::logger& logger() {
   static auto logger = cs::utils::createLogger("csp-satellites");
-  return *logger.get();
+  return *logger;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
