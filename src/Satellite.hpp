@@ -37,12 +37,12 @@ class Satellite : public cs::scene::CelestialBody {
       std::shared_ptr<cs::core::SolarSystem> solarSystem);
 
   Satellite(Satellite const& other) = delete;
-  Satellite(Satellite&& other)      = delete;
+  Satellite(Satellite&& other)      = default;
 
   Satellite& operator=(Satellite const& other) = delete;
   Satellite& operator=(Satellite&& other) = delete;
 
-  ~Satellite() override;
+  ~Satellite();
 
   void update(double tTime, cs::scene::CelestialObserver const& oObs) override;
 
